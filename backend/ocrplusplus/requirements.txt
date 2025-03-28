@@ -1,0 +1,12 @@
+PyPDF2==3.0.1
+pdfminer.six==20221105
+Flask==3.1.0
+numpy==1.26.0
+seqeval==0.0.12
+# torch==2.6.0+cu118
+torch==2.5.1
+torchvision
+torchaudio
+tqdm==4.67.1
+transformers==4.49.0
+scikit-learn==1.6.1

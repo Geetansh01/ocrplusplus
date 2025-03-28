@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Resume Extractor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 10px;
+      width: 300px;
+    }
+    h2 {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    input[type="file"] {
+      margin-bottom: 10px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 5px; /* Add spacing between buttons */
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #status {
+      margin-top: 10px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <h2>Upload Your Resume</h2>
+  <input type="file" id="resumeUpload" accept=".txt">
+  <button id="extractButton">Extract Entities</button>
+  <button id="fillFormBtn">Fill Form</button> <!-- Add the Fill Form button -->
+  <div id="status"></div>
+  <script src="popup.js"></script>
+</body>
+</html>
