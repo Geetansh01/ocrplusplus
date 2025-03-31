@@ -3,6 +3,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const entityPreview = document.getElementById('entityPreview');
   const status = document.getElementById('status');
 
+  const pdfjsLib = window['pdfjsLib'] || {};
+  pdfjsLib.GlobalWorkerOptions = {
+    workerSrc: chrome.runtime.getURL('pdf.worker.min.js')
+  };
+
   previewSection.classList.add('hidden');
 
   document.getElementById('extractButton').addEventListener('click', handleFileUpload);
@@ -20,28 +25,52 @@ document.addEventListener('DOMContentLoaded', () => {
     status.textContent = 'Extracting entities...';
     
     try {
-      const resumeText = await readFile(file);
+      const resumeText = await extractTextFromFile(file);
       await sendTextToBackend(resumeText);
     } catch (error) {
       console.error('Error:', error);
-      status.textContent = 'Error processing file.';
+      status.textContent = `Error: ${error.message || 'Processing failed'}`;
     }
   }
 
-  async function readFile(file) {
+  async function extractTextFromFile(file) {
+    if (file.type === 'text/plain') {
+      return readTextFile(file);
+    } else if (file.type === 'application/pdf') {
+      return extractTextFromPDF(file);
+    }
+    throw new Error('Unsupported file type');
+  }
+
+  function readTextFile(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = (event) => resolve(event.target.result);
-      reader.onerror = reject;
-      
-      if (file.type === 'text/plain') {
-        reader.readAsText(file);
-      } else if (file.type === 'application/pdf') {
-        // PDF reading not implemented yet
-        reject(new Error('PDF support not implemented yet'));
-      } else {
-        reject(new Error('Unsupported file type'));
-      }
+      reader.onload = (e) => resolve(e.target.result);
+      reader.onerror = () => reject(new Error('Failed to read text file'));
+      reader.readAsText(file);
+    });
+  }
+
+  async function extractTextFromPDF(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const typedArray = new Uint8Array(e.target.result);
+          const pdf = await pdfjsLib.getDocument(typedArray).promise;
+          let text = '';
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            text += content.items.map(item => item.str).join(' ');
+          }
+          resolve(text);
+        } catch (error) {
+          reject(new Error(`PDF extraction failed: ${error.message}`));
+        }
+      };
+      reader.onerror = () => reject(new Error('Failed to read PDF'));
+      reader.readAsArrayBuffer(file);
     });
   }
 
