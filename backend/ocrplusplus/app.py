@@ -2,6 +2,8 @@ import torch
 from transformers import BertTokenizerFast, BertForTokenClassification
 from flask import Flask, request, jsonify
 from UtilityFunctions.utilityFunctions2 import preprocess_data, predict, idx2tag
+import PyPDF2
+import io
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
@@ -20,8 +22,15 @@ model.to(DEVICE)
 
 @app.route('/extract', methods=['POST'])
 def extract():
-    data = request.json
-    resume_text = data.get('text', '')
+    if 'file' in request.files:
+        file = request.files['file']
+        if file.filename.endswith('.pdf'):
+            resume_text = extract_text_from_pdf(file)
+        else:
+            return jsonify({'error': 'Unsupported file type'}), 400
+    else:
+        resume_text = request.json.get('text', '')
+
     if not resume_text:
         return jsonify({'error': 'No text provided'}), 400
 
@@ -45,6 +54,13 @@ def extract():
         'raw': raw_entities,
         'structured': structured_data
     })
+
+def extract_text_from_pdf(file):
+    pdf_reader = PyPDF2.PdfReader(io.BytesIO(file.read()))
+    text = ""
+    for page in pdf_reader.pages:
+        text += page.extract_text()
+    return text
 
 if __name__ == '__main__':
     app.run(debug=True)
