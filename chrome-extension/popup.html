@@ -1,44 +1,74 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Resume Extractor</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 10px;
-      width: 300px;
-    }
-    h2 {
-      font-size: 16px;
-      margin-bottom: 10px;
-    }
-    input[type="file"] {
-      margin-bottom: 10px;
-    }
-    button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-right: 5px; /* Add spacing between buttons */
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    #status {
-      margin-top: 10px;
-      color: green;
-    }
-  </style>
-</head>
-<body>
-  <h2>Upload Your Resume</h2>
-  <input type="file" id="resumeUpload" accept=".txt">
-  <button id="extractButton">Extract Entities</button>
-  <button id="fillFormBtn">Fill Form</button> <!-- Add the Fill Form button -->
-  <div id="status"></div>
-  <script src="popup.js"></script>
-</body>
+  <head>
+    <title>Resume Extractor</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 10px;
+        width: 300px;
+      }
+      h2 {
+        font-size: 16px;
+        margin-bottom: 10px;
+      }
+      input[type="file"] {
+        margin-bottom: 10px;
+      }
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-right: 5px;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      #status {
+        margin-top: 10px;
+        color: green;
+        font-size: 12px;
+      }
+      #previewSection {
+        margin-top: 15px;
+        max-height: 200px;
+        overflow-y: auto;
+        border-top: 1px solid #eee;
+        padding-top: 10px;
+      }
+      #entityPreview {
+        font-size: 12px;
+        margin-bottom: 10px;
+      }
+      .entity-group {
+        margin-bottom: 5px;
+      }
+      .entity-type {
+        font-weight: bold;
+      }
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Upload Resume</h2>
+    <input type="file" id="resumeUpload" accept=".txt, .pdf" />
+    <div>
+      <button id="extractButton">Extract Entities</button>
+      <button id="confirmFill">Fill Form</button>
+    </div>
+
+    <div id="status"></div>
+
+    <div id="previewSection" class="hidden">
+      <h3>Extracted Data Preview</h3>
+      <div id="entityPreview"></div>
+      <button id="confirmFill">Confirm & Fill Form</button>
+    </div>
+    <script src="popup.js"></script>
+  </body>
 </html>

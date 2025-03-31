@@ -1,6 +1,6 @@
 import torch
 from transformers import BertTokenizerFast, BertForTokenClassification
-from flask import Flask, request, render_template_string, jsonify
+from flask import Flask, request, jsonify
 from UtilityFunctions.utilityFunctions2 import preprocess_data, predict, idx2tag
 
 app = Flask(__name__)
@@ -25,10 +25,26 @@ def extract():
     if not resume_text:
         return jsonify({'error': 'No text provided'}), 400
 
-    # Preprocess and predict entities
     resume_text = preprocess_data(resume_text)
-    entities = predict(model, TOKENIZER, idx2tag, DEVICE, resume_text, MAX_LEN)
-    return jsonify(entities)
+    raw_entities = predict(model, TOKENIZER, idx2tag, DEVICE, resume_text, MAX_LEN)
+  
+    structured_data = {
+        'name': next((e['text'] for e in raw_entities if e['entity'] == 'Name'), ''),
+        'degree': [e['text'] for e in raw_entities if e['entity'] == 'Degree'],
+        'skills': [e['text'] for e in raw_entities if e['entity'] == 'Skills'],
+        'college_name': [e['text'] for e in raw_entities if e['entity'] == 'College Name'],
+        'email': next((e['text'] for e in raw_entities if e['entity'] == 'Email Address'), ''),
+        'designation': [e['text'] for e in raw_entities if e['entity'] == 'Designation'],
+        'companies': [e['text'] for e in raw_entities if e['entity'] == 'Companies worked at'],
+        'graduation_year': next((e['text'] for e in raw_entities if e['entity'] == 'Graduation Year'), ''),
+        'experience': next((e['text'] for e in raw_entities if e['entity'] == 'Years of Experience'), ''),
+        'location': next((e['text'] for e in raw_entities if e['entity'] == 'Location'), '')
+    }
+    
+    return jsonify({
+        'raw': raw_entities,
+        'structured': structured_data
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)
