@@ -1,105 +1,30 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Resume Extractor</title>
+    <title>ResumeFillAssist</title>
     <script src="pdf.min.js"></script>
-    <style>
-      body {
-        background-color: black;
-        color: rgb(179, 179, 179);
-        font-family: Arial, sans-serif;
-        padding: 20px;
-        width: 300px;
-      }
-      h2 {
-        font-size: 16px;
-        margin-bottom: 10px;
-      }
-      input[type="file"] {
-        margin-bottom: 10px;
-      }
-      button {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 4px;
-        cursor: pointer;
-        margin-right: 5px;
-      }
-      button:hover {
-        background-color: #0056b3;
-      }
-
-      .yet{
-        display: flex;
-        justify-content: space-between;
-        margin-top: 10px;
-      }
-
-      ::-webkit-scrollbar {
-        width: 5px;
-      }
-
-      ::-webkit-scrollbar-track {
-        background: rgba(217, 217, 217, 0.1);
-        border-radius: 10px;
-      }
-
-      ::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 20px;
-      }
-
-      ::-webkit-scrollbar-thumb:hover {
-        background: #555;
-      }
-
-      #status {
-        margin-top: 10px;
-        color: rgb(0, 163, 0);
-        font-size: 12px;
-      }
-      #previewSection {
-        margin-top: 15px;
-        max-height: 200px;
-        overflow-y: auto;
-        border-top: 1px solid #eee;
-        padding-top: 10px;
-      }
-      #entityPreview {
-        font-size: 12px;
-        margin-bottom: 10px;
-      }
-      .entity-group {
-        margin-bottom: 5px;
-      }
-      .entity-type {
-        font-weight: bold;
-      }
-      .hidden {
-        display: none;
-      }
-      #fieldMappingSection {
-        margin-top: 15px;
-        border-top: 1px solid #eee;
-        padding-top: 10px;
-      }
-      .mapping-item {
-        margin-bottom: 5px;
-        padding: 5px;
-        background: #f5f5f5;
-        border-radius: 3px;
-      }
-      .mapping-select {
-        margin-left: 10px;
-        min-width: 150px;
-      }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
-    <h2>Upload Resume</h2>
-    <input type="file" id="resumeUpload" accept=".txt, .pdf" />
+    <h4 class="montserrat-font">
+      Hello! Welcome to ResumeFillAssist,<br />an AI-powered tool to help you
+      fill out job applications.
+    </h4>
+    <h2>Upload the Resume</h2>
+    <label for="resumeUpload" id="drop-area">
+      <input type="file" accept=".txt, .pdf" id="resumeUpload" hidden />
+      <div id="img-view">
+        <img src="upload.png" height="100px" alt="Upload icon" />
+        <p>Drag and drop or click here<br /><br />to upload a resume pdf</p>
+      </div>
+    </label>
+
     <div class="yet">
       <button id="extractButton">Extract Entities</button>
       <button id="confirmFill">Fill Form</button>

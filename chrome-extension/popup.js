@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const dropArea = document.getElementById("drop-area");
+  const fileInput = document.getElementById('resumeUpload');
+  const extractButton = document.getElementById("extractButton");
+  const confirmFill = document.getElementById("confirmFill");
   const previewSection = document.getElementById('previewSection');
   const entityPreview = document.getElementById('entityPreview');
   const status = document.getElementById('status');
@@ -10,8 +14,75 @@ document.addEventListener('DOMContentLoaded', () => {
 
   previewSection.classList.add('hidden');
 
-  document.getElementById('extractButton').addEventListener('click', handleFileUpload);
-  document.getElementById('confirmFill').addEventListener('click', fillForm);
+  extractButton.addEventListener("click", handleFileUpload);
+  confirmFill.addEventListener("click", fillForm);
+
+  // Prevent default drag behaviors
+  ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+    dropArea.addEventListener(eventName, preventDefaults, false);
+    document.body.addEventListener(eventName, preventDefaults, false);
+  });
+
+  // Highlight drop area when item is dragged over it
+  ["dragenter", "dragover"].forEach((eventName) => {
+    dropArea.addEventListener(eventName, highlight, false);
+  });
+
+  ["dragleave", "drop"].forEach((eventName) => {
+    dropArea.addEventListener(eventName, unhighlight, false);
+  });
+
+  // Handle dropped files
+  dropArea.addEventListener("drop", handleDrop, false);
+
+  // Handle file input changes (when user selects file through dialog)
+  fileInput.addEventListener("change", handleFiles, false);
+
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  function highlight() {
+    dropArea.classList.add("highlight");
+  }
+
+  function unhighlight() {
+    dropArea.classList.remove("highlight");
+  }
+
+  function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    if (files.length) {
+      fileInput.files = files;
+      handleFiles({ target: { fileInput } });
+    }
+  }
+
+  function handleFiles(e) {
+    const files = e.target.files;
+
+    if (files.length) {
+      const file = files[0];
+      if (
+        file.type === "application/pdf" ||
+        file.name.toLowerCase().endsWith(".pdf")
+      ) {
+        document.querySelector(
+          "#img-view p"
+        ).textContent = `Selected: ${file.name}`;
+        extractTextFromFile(file);
+      } else if (
+        file.type === "text/plain" ||
+        file.name.toLowerCase().endsWith(".txt")
+      ) {
+        readTextFile(file);
+      } else {
+        alert("Please select a text file or pdf file.");
+      }
+    }
+  }
 
   async function handleFileUpload() {
     const fileInput = document.getElementById('resumeUpload');
