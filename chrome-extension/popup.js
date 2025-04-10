@@ -51,14 +51,24 @@ document.addEventListener('DOMContentLoaded', () => {
     dropArea.classList.remove("highlight");
   }
 
-  function handleDrop(e) {
-    const dt = e.dataTransfer;
-    const files = dt.files;
-    if (files.length) {
-      fileInput.files = files;
-      handleFiles({ target: { fileInput } });
-    }
+  
+function handleDrop(e) {
+  const dt = e.dataTransfer;
+  const files = dt.files;
+  
+  if (files.length) {
+    const dataTransfer = new DataTransfer();
+    
+    
+    dataTransfer.items.add(files[0]);
+    
+    
+    fileInput.files = dataTransfer.files;
+    
+
+    handleFiles({ target: fileInput });
   }
+}
 
   function handleFiles(e) {
     const files = e.target.files;
@@ -224,3 +234,88 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 });
+
+
+//Geeeeeeeeeeeeeetansh try this for spliting into text
+
+function splitTextIntoChunks(text, maxChunkSize) {
+  const chunks = [];
+  let currentChunk = '';
+  
+  // Split by paragraphs
+  const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim() !== '');
+  
+  for (const paragraph of paragraphs) {
+    // If the paragraph alone exceeds max chunk size, we have to split it
+    if (paragraph.length > maxChunkSize) {
+      // First add the current chunk if it's not empty
+      if (currentChunk.length > 0) {
+        chunks.push(currentChunk);
+        currentChunk = '';
+      }
+      
+      // Split large paragraph by sentences
+      const sentences = paragraph.split(/(?<=[.!?])\s+/);
+      let sentenceChunk = '';
+      
+      for (const sentence of sentences) {
+        // If adding this sentence would exceed chunk size
+        if (sentenceChunk.length + sentence.length > maxChunkSize) {
+          // If sentence chunk is not empty, add it to chunks
+          if (sentenceChunk.length > 0) {
+            chunks.push(sentenceChunk);
+            sentenceChunk = sentence;
+          } else {
+            // If the sentence alone is too large, we have to split it
+            chunks.push(sentence.substring(0, maxChunkSize));
+            // Handle any remaining parts of extremely long sentences
+            if (sentence.length > maxChunkSize) {
+              const remaining = sentence.substring(maxChunkSize);
+              for (let i = 0; i < remaining.length; i += maxChunkSize) {
+                chunks.push(remaining.substring(i, i + maxChunkSize));
+              }
+            }
+          }
+        } else {
+          // Add sentence to current sentence chunk
+          sentenceChunk += (sentenceChunk ? ' ' : '') + sentence;
+        }
+      }
+      
+      // Add any remaining sentence chunk
+      if (sentenceChunk.length > 0) {
+        chunks.push(sentenceChunk);
+      }
+    } 
+    // Check if adding this paragraph would exceed chunk size
+    else if (currentChunk.length + paragraph.length > maxChunkSize) {
+      // Save current chunk and start a new one with this paragraph
+      chunks.push(currentChunk);
+      currentChunk = paragraph;
+    } else {
+      // Add paragraph to current chunk
+      currentChunk += (currentChunk ? '\n\n' : '') + paragraph;
+    }
+  }
+  
+  // Add the last chunk if it's not empty
+  if (currentChunk) {
+    chunks.push(currentChunk);
+  }
+  
+  return chunks;
+}
+
+// Helper function to remove duplicate entities
+function removeDuplicateEntities(entities) {
+  const seen = new Set();
+  return entities.filter(entity => {
+    // Create a unique key based on entity type and text
+    const key = `${entity.entity}:${entity.text}`;
+    if (seen.has(key)) {
+      return false;
+    }
+    seen.add(key);
+    return true;
+  });
+}
